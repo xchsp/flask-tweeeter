@@ -17,11 +17,7 @@
                 <div class="columns">
                     {% set profile_pic = url_for('static', filename='profile_pics/' + user.image_file) %}
                     <div class="column is-one-third">
-                        <!-- <div class="profile-cropper" style="width: 90%;">
-                            <img src="{{ profile_pic }}" alt="Profile Picture" class="profile-image">
-                        </div> -->
-                        <img src="{{ profile_pic }}" style="width: 80px;
-                        height: 80px;" class="profile">
+                        <img src="{{ profile_pic }}" width="80" class="profile">
                     </div>
                     <div class="column">
                         <a href="{{ url_for('profile') }}">
@@ -32,6 +28,8 @@
                             </h5>
                         </a>
                         <h6 class="subtitle is-6" style="margin-bottom: 1rem; font-size: 80%;">{{ user.email }}</h6>
+
+
                         <div class="level">
                             <div class="level-left">
                                 <div class="content is-small">
@@ -47,7 +45,16 @@
                                     <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_likes|length }}</h4>
                                 </div>
                             </div>
+                            <div class="level-item">
+                                <div class="content is-small">
+                                    <small>Followers</small>
+                                    {% set user_followers = user.followers.all() %}
+                                    <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_followers|length }}</h4>
+                                </div>
+                            </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -87,7 +94,37 @@
     <div class="column is-one-quarter is-hidden-touch">
         <div class="wrap" style="position: -webkit-sticky; position: sticky; top: 0;">
             <h2 class="title is-2">Follow</h2>
-            <div class="box"></div>
+            <div class="box">
+
+                {% for suggestion in follow_suggestions %}
+                <div class="columns is-vcentered" style="margin-top: 2px; margin-bottom: 2px;">
+                    <div class="column is-one-third">
+                        <img src="{{ url_for('static', filename='profile_pics/' + suggestion.image_file) }}"
+                            alt="{{ suggestion.username }}" class="profile" width="60">
+                    </div>
+                    <div class="column">
+                        <h2 class="title is-6 has-text-info">{{ suggestion.username }}</h2>
+                    </div>
+                    <div class="column is-one-quarter">
+                        {% if user in suggestion.followers.all() %}
+                        <a href="{{ url_for('unfollow', id=suggestion.id) }}">
+                            <div class="box icon has-background-light is-small">
+                                <i class="fas fa-user-minus has-text-danger"></i>
+                            </div>
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('follow', id=suggestion.id) }}">
+                            <div class="box has-background-info icon is-small">
+                                <i class="fas fa-user-plus has-text-white"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                    </div>
+                </div>
+                <hr class="is-marginless">
+                {% endfor %}
+            </div>
         </div>
     </div>
 

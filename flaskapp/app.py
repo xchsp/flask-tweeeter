@@ -24,6 +24,15 @@ likes = db.Table('likes',
                  )
 
 
+# Likes association table (associates between users and likes with to columns)
+followers = db.Table('follows',
+                     db.Column('follower_id', db.Integer,
+                               db.ForeignKey('user.id'), nullable=True),
+                     db.Column('followed_id', db.Integer,
+                               db.ForeignKey('user.id'), nullable=True)
+                     )
+
+
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +44,10 @@ class User(db.Model):
     posts = db.relationship('Post', backref='author', lazy=True)
     likes = db.relationship('Post', secondary=likes,
                             backref=db.backref('likes', lazy='dynamic'), lazy='dynamic')
+    followed = db.relationship('User', secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     # Defines how a user object will be printed in the shell
     def __repr__(self):
@@ -58,12 +71,13 @@ class Post(db.Model):
 @app.route('/')
 def home():
     posts = Post.query.all()
+    follow_suggestions = User.query.all()[0:5]
 
     user = None
     if len(session) > 0:
         user = User.query.filter_by(username=session['username']).first()
 
-    return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes)
+    return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
 
 
 # Single post route
@@ -289,6 +303,47 @@ def search():
             posts = posts + user.posts
 
         return render_template('results.html', posts=posts)
+
+
+@app.route('/follow/<id>')
+@is_logged_in
+def follow(id):
+
+    user_following = User.query.filter_by(username=session['username']).first()
+    user_followed = User.query.filter_by(id=id).first()
+
+    if user_following == user_followed:
+        flash('You cant follow yourself -_-', 'danger')
+        return redirect(url_for('home'))
+    else:
+        user_following.followed.append(user_followed)
+
+        db.session.commit()
+
+        followed = User.query.filter_by(id=id).first()
+        flash(f'Followed {followed.username}', 'success')
+        return redirect(url_for('home'))
+
+
+@app.route('/unfollow/<id>')
+@is_logged_in
+def unfollow(id):
+
+    user_unfollowing = User.query.filter_by(
+        username=session['username']).first()
+    user_unfollowed = User.query.filter_by(id=id).first()
+
+    if user_unfollowing == user_unfollowed:
+        flash('You cant unfollow yourself -_-', 'danger')
+        return redirect(url_for('home'))
+    else:
+        user_unfollowing.followed.remove(user_unfollowed)
+
+        db.session.commit()
+
+        followed = User.query.filter_by(id=id).first()
+        flash(f'Unfollowed {followed.username}', 'success')
+        return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
