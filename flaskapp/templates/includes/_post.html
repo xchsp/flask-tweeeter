@@ -1,0 +1,46 @@
+{% set id = post.id %}
+<div class="box" id="{{id}}">
+    <a href="/post/{{post.id}}" class="has-text-dark">
+        <article class="media">
+            <figure class="media-left">
+                <p class="image is-64x64">
+                    {% set profile_pic = url_for('static', filename='profile_pics/' + post.author.image_file) %}
+                    <img src="{{ profile_pic }}" style="width: 64px; height: 64px;" class="profile">
+                </p>
+            </figure>
+            <div class="media-content">
+                <div class="content">
+                    <p style="margin-bottom: .8rem;">
+                        <strong class="has-text-info">@{{post.author.username}}{% if post.author.verified %}
+                            &nbsp;<i class="fas fa-check-circle"></i>
+                            {% endif %}</strong>
+                        <small
+                            class="has-text-weight-semibold">&nbsp;&nbsp;{{post.date_posted.strftime('%B %d, %Y')}}</small>
+                        <br>
+                        <p style="margin-bottom: .8rem;">{{post.content}}</p>
+                    </p>
+                </div>
+                <div class="level-left">
+                    <a class="level-item has-text-weight-semibold" href="/like/{{post.id}}">
+                        <!--  if username found in session (user is logged in) -->
+                        {% if user != None %}
+                        <!-- if user has liked post make heart red and full -->
+                        {% if user in post.likes.all() %}
+                        <span class="icon is-small has-text-danger"><i
+                                class="fas fa-heart"></i>&nbsp;&nbsp;</span>{{post.likes.all()|length}}
+                        <!-- if user hasnt liked post make heart grey and empty -->
+                        {% else %}
+                        <span class="icon is-small has-text-dark"><i
+                                class="far fa-heart"></i>&nbsp;&nbsp;</span>{{post.likes.all()|length}}
+                        {% endif %}
+                        <!-- if user is not logged in make heart grey and empty -->
+                        {% else %}
+                        <span class="icon is-small has-text-dark"><i
+                                class="far fa-heart"></i>&nbsp;&nbsp;</span>{{post.likes.all()|length}}
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </article>
+    </a>
+</div>

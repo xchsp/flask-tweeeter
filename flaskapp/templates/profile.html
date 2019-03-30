@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1 class="title is-1">Profile</h1>
+<h2 class="subtitle is-4">Welcome {{session.username}}</h2>
+<img src="{{ profile_pic }}" alt="Profile Picture" style="width: 100px; height: 100px;" class="profile">
+<a href="
+    {{ url_for('new_post') }}" class=" button is-info is-rounded">New Post</a>
+<hr>
+{% endblock %}

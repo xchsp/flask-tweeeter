@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1 class="title is-1">Login</h1>
+<form action="" method="POST" style="width: 35%;">
+    <div class="control" style="margin-bottom: 1.5rem;">
+        <label for="email">Email</label>
+        <input type="text" name="email" class="input" value="{{request.form.email}}">
+    </div>
+    <div class="control" style="margin-bottom: 1.5rem;">
+        <label for="password">Password</label>
+        <input type="password" name="password" class="input" value="{{request.form.password}}">
+    </div>
+    <button type="submit" class="button is-info">Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html style="background-color: #e6ecf0;">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tweeeter!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    {% block head %}{% endblock %}
+</head>
+
+<body class="has-navbar-fixed-top">
+
+    {% include 'includes/_navbar.html' %}
+
+
+    <style>
+        img.profile {
+            object-fit: cover;
+            border-radius: 50%;
+            /* width: 80px;
+            height: 80px; */
+            /* set inline */
+        }
+    </style>
+
+
+    <div class="container" style="padding-top: 1rem;">
+        {% include 'includes/_flash.html' %}
+
+        {% block body %}
+
+        {% endblock %}
+    </div>
+
+
+</body>
+
+</html>

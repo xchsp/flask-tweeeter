@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="columns">
+
+
+
+
+
+
+
+    <div class="column is-one-quarter is-hidden-touch">
+        {% if user != None %}
+        <div class="wrap" style="position: -webkit-sticky; position: sticky; top: 0;">
+            <h2 class="title is-2">Profile</h2>
+            <div class="box">
+                <div class="columns">
+                    {% set profile_pic = url_for('static', filename='profile_pics/' + user.image_file) %}
+                    <div class="column is-one-third">
+                        <!-- <div class="profile-cropper" style="width: 90%;">
+                            <img src="{{ profile_pic }}" alt="Profile Picture" class="profile-image">
+                        </div> -->
+                        <img src="{{ profile_pic }}" style="width: 80px;
+                        height: 80px;" class="profile">
+                    </div>
+                    <div class="column">
+                        <a href="{{ url_for('profile') }}">
+                            <h5 class="title is-5 has-text-info">@{{ user.username }}&nbsp;
+                                {% if user.verified %}
+                                <i class="fas fa-check-circle"></i>
+                                {% endif %}
+                            </h5>
+                        </a>
+                        <h6 class="subtitle is-6" style="margin-bottom: 1rem; font-size: 80%;">{{ user.email }}</h6>
+                        <div class="level">
+                            <div class="level-left">
+                                <div class="content is-small">
+                                    <small>Tweeets</small>
+                                    {% set user_posts = Post_model.query.filter_by(user_id=user.id).all() %}
+                                    <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_posts|length }}</h4>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div class="content is-small">
+                                    <small>Has liked</small>
+                                    {% set user_likes = user.likes.all() %}
+                                    <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_likes|length }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+
+
+
+
+    <div class="column is-half">
+
+        <div class="level is-hidden-touch">
+            <div class="level-left">
+                <h2 class="title is-2">Tweeets</h2>
+            </div>
+            <div class="level-right">
+                <h6 class="subtitle is-5" style="margin: .4rem 22.5rem 0 0;">Most recent</h6>
+            </div>
+        </div>
+
+        {% for post in posts|reverse %}
+
+
+        {% include "includes/_post.html" %}
+
+        {% endfor %}
+
+    </div>
+
+
+
+
+
+
+    <div class="column is-one-quarter is-hidden-touch">
+        <div class="wrap" style="position: -webkit-sticky; position: sticky; top: 0;">
+            <h2 class="title is-2">Follow</h2>
+            <div class="box"></div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+{% endblock %}

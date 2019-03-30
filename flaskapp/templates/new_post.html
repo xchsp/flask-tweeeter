@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/emojionearea.min.css">
+<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="/static/js/emojionearea.min.js"></script>
+{% endblock %}
+
+
+{% block body %}
+<h1 class="title is-1">New Post</h1>
+{% from "includes/_formhelpers.html" import render_field %}
+<form action="" method="POST">
+    <div class="control" style="width: 45%; margin-bottom: 1.5rem;">
+        {{ render_field(form.content, class_='textarea') }}
+    </div>
+    <input type="submit" value="Post" class="button is-info is is-medium">
+</form>
+
+<script>
+    $(document).ready(function () {
+        $(".textarea").emojioneArea({
+            pickerPosition: "right"
+        });
+    })
+</script>
+{% endblock %}
