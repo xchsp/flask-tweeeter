@@ -8,8 +8,10 @@ A beginner project using the following stack:
 * Python
 * Flask
 * SQLAlchemy (ORM)
+* Flask Migrate
 * Sha_256 (PASSWORD HASHING)
 * WTForms (REGISTRATION FORMS)
+* Bulma css framework
 
 <br/>
 
