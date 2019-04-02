@@ -66,6 +66,9 @@
 
 
 
+
+
+
     <div class="column is-half">
 
         <div class="level is-hidden-touch">
@@ -73,7 +76,32 @@
                 <h2 class="title is-2">Tweeets</h2>
             </div>
             <div class="level-right">
-                <h6 class="subtitle is-5" style="margin: .4rem 22.5rem 0 0;">Most recent</h6>
+                <div class="field has-addons" style="margin: .5rem 6rem 0 0;">
+                    <p class="control">
+                        {% if url_for(request.endpoint) == url_for('home') %}
+                        <a class="button has-background-info has-text-white has-text-weight-bold"
+                            href="{{ url_for('home') }}">
+                            <span>Explore</span>
+                        </a>
+                        {% else %}
+                        <a class="button" href="{{ url_for('home') }}">
+                            <span>Explore</span>
+                        </a>
+                        {% endif %}
+                    </p>
+                    <p class="control">
+                        {% if url_for(request.endpoint) == url_for('home_following') %}
+                        <a class="button has-background-info has-text-white has-text-weight-bold"
+                            href="{{ url_for('home_following') }}">
+                            <span>Following</span>
+                        </a>
+                        {% else %}
+                        <a class="button" href="{{ url_for('home_following') }}">
+                            <span>Following</span>
+                        </a>
+                        {% endif %}
+                    </p>
+                </div>
             </div>
         </div>
 

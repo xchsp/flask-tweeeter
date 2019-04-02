@@ -69,7 +69,19 @@ class Post(db.Model):
         return f"Post ('{self.id}', '{self.date_posted}')"
 
 
-# Home route
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
+# Home route (default)
 @app.route('/')
 def home():
     posts = Post.query.all()
@@ -78,6 +90,29 @@ def home():
     user = None
     if len(session) > 0:
         user = User.query.filter_by(username=session['username']).first()
+
+    return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
+
+
+# Home route (following)
+@app.route('/following')
+@is_logged_in
+def home_following():
+
+    follow_suggestions = User.query.all()[0:5]
+
+    user = None
+    if len(session) > 0:
+        user = User.query.filter_by(username=session['username']).first()
+
+    follows = user.followed.all()
+    posts = []
+
+    for follow in follows:
+        user_posts = Post.query.filter_by(author=follow)
+        posts += user_posts
+
+    posts.sort(key=lambda r: r.date_posted)  # Sorts posts by date
 
     return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
 
@@ -165,18 +200,6 @@ def login():
 
     # GET Request
     return render_template('login.html')
-
-
-# Check if user logged in
-def is_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Unauthorized, Please login', 'danger')
-            return redirect(url_for('login'))
-    return wrap
 
 
 # Logout
