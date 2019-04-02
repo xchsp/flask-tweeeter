@@ -14,8 +14,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
 app.config['UPLOAD_FOLDER'] = 'N:\\Documents\\webdev\\python\\tweeter\\flaskapp\\static\\profile_pics'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+
 
 # Likes association table (associates between users and likes with to columns)
 likes = db.Table('likes',
