@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-app.config['UPLOAD_FOLDER'] = 'N:\\Documents\\webdev\\python\\tweeter\\flaskapp\\static\\profile_pics'
+app.config['UPLOAD_FOLDER'] = 'N:\\Documents\\webdev\\python\\flask-tweeeter\\flaskapp\\static\\profile_pics'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'JPG', 'PNG'])
 
 
@@ -80,6 +80,15 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap
 
+# For if and which user is logged in
+
+
+def current_user():
+    if len(session) > 0:
+        return User.query.filter_by(username=session['username']).first()
+    else:
+        return None
+
 
 # Home route (default)
 @app.route('/')
@@ -87,13 +96,12 @@ def home():
     posts = Post.query.all()
     follow_suggestions = User.query.all()[0:6]
 
-    user = None  # Default
-    if len(session) > 0:  # If there is a user in the session
-        user = User.query.filter_by(username=session['username']).first()
-        if user in follow_suggestions:  # If the current user is in the user's follow suggestions
-            follow_suggestions.remove(user)
+    # Remove current user from follow suggestions
+    if current_user():  # If there is a user in the session
+        if current_user() in follow_suggestions:  # If the current user is in the user's follow suggestions
+            follow_suggestions.remove(current_user())
 
-    return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
+    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
 
 
 # Home route (following)
@@ -103,11 +111,7 @@ def home_following():
     posts = []
     follow_suggestions = User.query.all()[0:5]
 
-    user = None  # Default
-    if len(session) > 0:  # If there is a user in the session
-        user = User.query.filter_by(username=session['username']).first()
-
-    follows = user.followed.all()
+    follows = current_user().followed.all()
 
     for follow in follows:  # Get all posts by folled accounts
         user_posts = Post.query.filter_by(author=follow)
@@ -115,7 +119,12 @@ def home_following():
 
     posts.sort(key=lambda r: r.date_posted)  # Sorts posts by date
 
-    return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
+    # Remove current user from follow suggestions
+    if current_user():  # If there is a user in the session
+        if current_user() in follow_suggestions:  # If the current user is in the user's follow suggestions
+            follow_suggestions.remove(current_user())
+
+    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
 
 
 # Single post route
@@ -216,10 +225,8 @@ def logout():
 @app.route('/profile')
 @is_logged_in
 def profile():
-
-    user = User.query.filter_by(username=session['username']).first()
-
-    profile_pic = url_for('static', filename='profile_pics/' + user.image_file)
+    profile_pic = url_for(
+        'static', filename='profile_pics/' + current_user().image_file)
     return render_template('profile.html', profile_pic=profile_pic)
 
 
@@ -236,10 +243,8 @@ def new_post():
         # Get form content
         content = form.content.data
 
-        user_id = User.query.filter_by(username=session['username']).first()
-
         # Make post object
-        post = Post(content=content, author=user_id)
+        post = Post(content=content, author=current_user())
 
         # Add post to db session
         db.session.add(post)
@@ -259,7 +264,6 @@ def new_post():
 def like_post(id):
 
     post = Post.query.filter_by(id=id).first()
-    user = User.query.filter_by(username=session['username']).first()
 
     # If the requested post does not exist
     if post is None:
@@ -267,13 +271,13 @@ def like_post(id):
         return redirect(url_for('home'))
 
     # If the user has already liked the post
-    if user in post.likes.all():
-        post.likes.remove(user)
+    if current_user() in post.likes.all():
+        post.likes.remove(current_user())
         db.session.commit()
         return redirect(url_for('home', _anchor=id))
     # If the user has not liked the post yet
     else:
-        post.likes.append(user)
+        post.likes.append(current_user())
         db.session.commit()
         return redirect(url_for('home', _anchor=id))
 
@@ -288,8 +292,6 @@ def allowed_file(filename):
 @app.route('/update_photo', methods=['GET', 'POST'])
 @is_logged_in
 def update_photo():
-
-    user = User.query.filter_by(username=session['username']).first()
 
     if request.method == 'POST':
 
@@ -311,7 +313,7 @@ def update_photo():
 
             filename = secure_filename(file.filename)
 
-            user.image_file = filename
+            current_user().image_file = filename
             db.session.commit()
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -320,7 +322,7 @@ def update_photo():
                 f'Succesfully changed profile picture to {filename}', 'success')
             return redirect(url_for('profile'))
 
-    return render_template('update_photo.html', user=user)
+    return render_template('update_photo.html', user=current_user())
 
 
 # Search route
@@ -343,7 +345,7 @@ def search():
 def follow(id):
 
     # Get current user
-    user_following = User.query.filter_by(username=session['username']).first()
+    user_following = current_user()
     # Find user being followed by id
     user_followed = User.query.filter_by(id=id).first()
 
@@ -367,8 +369,7 @@ def follow(id):
 @is_logged_in
 def unfollow(id):
     # Get current user
-    user_unfollowing = User.query.filter_by(
-        username=session['username']).first()
+    user_unfollowing = current_user()
     # Get user being unfollowed by id
     user_unfollowed = User.query.filter_by(id=id).first()
 
