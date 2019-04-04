@@ -16,7 +16,7 @@ migrate = Migrate(app, db)
 
 
 app.config['UPLOAD_FOLDER'] = 'N:\\Documents\\webdev\\python\\tweeter\\flaskapp\\static\\profile_pics'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'JPG', 'PNG'])
 
 
 # Likes association table (associates between users and likes with to columns)
@@ -85,30 +85,31 @@ def is_logged_in(f):
 @app.route('/')
 def home():
     posts = Post.query.all()
-    follow_suggestions = User.query.all()[0:5]
+    follow_suggestions = User.query.all()[0:6]
 
-    user = None
-    if len(session) > 0:
+    user = None  # Default
+    if len(session) > 0:  # If there is a user in the session
         user = User.query.filter_by(username=session['username']).first()
+        if user in follow_suggestions:  # If the current user is in the user's follow suggestions
+            follow_suggestions.remove(user)
 
     return render_template('home.html', posts=posts, user=user, Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
 
 
 # Home route (following)
-@app.route('/following')
+@app.route('/home_following')
 @is_logged_in
 def home_following():
-
+    posts = []
     follow_suggestions = User.query.all()[0:5]
 
-    user = None
-    if len(session) > 0:
+    user = None  # Default
+    if len(session) > 0:  # If there is a user in the session
         user = User.query.filter_by(username=session['username']).first()
 
     follows = user.followed.all()
-    posts = []
 
-    for follow in follows:
+    for follow in follows:  # Get all posts by folled accounts
         user_posts = Post.query.filter_by(author=follow)
         posts += user_posts
 
@@ -156,7 +157,7 @@ def register():
 
         flash('You are now registered and can log in', 'success')
 
-        return redirect(url_for('home'))
+        return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
 
@@ -277,7 +278,7 @@ def like_post(id):
         return redirect(url_for('home', _anchor=id))
 
 
-#
+# Split filename into file extension
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -292,22 +293,32 @@ def update_photo():
 
     if request.method == 'POST':
 
+        # No file selected
         if 'file' not in request.files:
-            flash('No file part', 'danger')
+
+            flash('No file selected', 'danger')
             return redirect(url_for('update_photo'))
+
         file = request.files['file']
+        # If empty file
         if file.filename == '':
-            flash('No selected file', 'danger')
+
+            flash('No file selected', 'danger')
             return redirect(url_for('update_photo'))
+
+        # If there is a file and it is allowed
         if file and allowed_file(file.filename):
+
             filename = secure_filename(file.filename)
-            flash(filename, 'success')
 
             user.image_file = filename
             db.session.commit()
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('update_photo'))
+
+            flash(
+                f'Succesfully changed profile picture to {filename}', 'success')
+            return redirect(url_for('profile'))
 
     return render_template('update_photo.html', user=user)
 
@@ -317,15 +328,12 @@ def update_photo():
 def search():
     if request.method == 'POST':
 
+        # Get query from form
         query = request.form['search']
 
-        posts = list(Post.query.filter(
-            Post.content.like('%' + query + '%')))
-
-        user = User.query.filter_by(username='%' + query + '%').first()
-
-        if user != None:
-            posts = posts + user.posts
+        # Search and save posts
+        posts = Post.query.filter(
+            Post.content.like('%' + query + '%'))
 
         return render_template('results.html', posts=posts)
 
@@ -334,40 +342,49 @@ def search():
 @is_logged_in
 def follow(id):
 
+    # Get current user
     user_following = User.query.filter_by(username=session['username']).first()
+    # Find user being followed by id
     user_followed = User.query.filter_by(id=id).first()
 
     if user_following == user_followed:
+
         flash('You cant follow yourself -_-', 'danger')
         return redirect(url_for('home'))
+
     else:
+        # Follow user
         user_following.followed.append(user_followed)
 
+        # Commit to db
         db.session.commit()
 
-        followed = User.query.filter_by(id=id).first()
-        flash(f'Followed {followed.username}', 'success')
+        flash(f'Followed {user_followed.username}', 'success')
         return redirect(url_for('home'))
 
 
 @app.route('/unfollow/<id>')
 @is_logged_in
 def unfollow(id):
-
+    # Get current user
     user_unfollowing = User.query.filter_by(
         username=session['username']).first()
+    # Get user being unfollowed by id
     user_unfollowed = User.query.filter_by(id=id).first()
 
     if user_unfollowing == user_unfollowed:
+
         flash('You cant unfollow yourself -_-', 'danger')
         return redirect(url_for('home'))
+
     else:
+        # Unfollow
         user_unfollowing.followed.remove(user_unfollowed)
 
+        # Commit to db
         db.session.commit()
 
-        followed = User.query.filter_by(id=id).first()
-        flash(f'Unfollowed {followed.username}', 'success')
+        flash(f'Unfollowed {user_unfollowed.username}', 'warning')
         return redirect(url_for('home'))
 
 

@@ -150,7 +150,10 @@
 
                     </div>
                 </div>
+                {% if suggestion != follow_suggestions[-1] %}
                 <hr class="is-marginless">
+                {% endif %}
+
                 {% endfor %}
             </div>
         </div>
