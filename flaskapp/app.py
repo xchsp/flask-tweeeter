@@ -80,9 +80,8 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap
 
-# For if and which user is logged in
 
-
+# Returns current user
 def current_user():
     if len(session) > 0:
         return User.query.filter_by(username=session['username']).first()
@@ -192,7 +191,7 @@ def login():
                 # Passed
                 session['logged_in'] = True
                 session['username'] = user.username
-                session['id'] = user.id
+                session['user_id'] = user.id
 
                 app.logger.info(f'{user.username} LOGGED IN SUCCESSFULLY')
                 flash('You are now logged in', 'success')
