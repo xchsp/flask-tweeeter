@@ -43,7 +43,7 @@
         <div class="navbar-brand">
 
             <a class="navbar-item has-text-info" href="{{ url_for('home') }}">
-                <img src="../../static/graphics/tweeeter-logo.png" alt="">
+                <img src="{{ url_for('static', filename='graphics/' + 'tweeeter-logo.png') }}" alt="">
             </a>
 
             <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">

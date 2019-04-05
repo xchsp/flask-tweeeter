@@ -11,7 +11,7 @@ A beginner project using the following stack:
 * Flask Migrate
 * Sha_256 (PASSWORD HASHING)
 * WTForms (REGISTRATION FORMS)
-* Bulma css framework
+* Bulma CSS framework
 
 <br/>
 
