@@ -1,4 +1,4 @@
-If you're here from GitHub and would like to help with any of these, I'd be happt to work with you :D
+If you're here from GitHub and would like to help with any of these, I'd be happy to work with you :D
 
 
 TODO:
@@ -6,6 +6,8 @@ TODO:
 [ ]     SPLIT APP INTO MULTIPLE MODULES
 [ ]     CONVERT COMMON LOGIC (IE CHECKING CURRENT USER) TO FUNCTIONS IN A UTILS MODULE
 [ ]     ATTEMPT TO COMBINE EXPLORE AND FOLLOWING VIEWS INTO ONE ROUTE
+[ ]     ADD SYSTEM THAT AUTOMATTICALY SWITCHES FROM SQLITE BASED ON ENVIORMENT
+[ ]     ADD FOLLOW SYSTEM TO MOBILE
 
 
 NOTE:
