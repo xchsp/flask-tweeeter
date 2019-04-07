@@ -151,7 +151,7 @@ def register():
 
         # Get form data
         username = form.username.data
-        email = form.email.data
+        email = form.email.data.lower()
         password = sha256_crypt.encrypt(str(form.password.data))
 
         # Make user object with form data
