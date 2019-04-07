@@ -175,11 +175,11 @@ def register():
 def login():
     if request.method == 'POST':
         # Get form fields
-        email = request.form['email']
+        email = request.form['email'].lower()
         password_candidate = request.form['password']
 
         # Get user by email
-        user = User.query.filter_by(email=lower(email)).first()
+        user = User.query.filter_by(email=email).first()
 
         # If there is a user with the email
         if user != None:
