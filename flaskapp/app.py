@@ -179,7 +179,7 @@ def login():
         password_candidate = request.form['password']
 
         # Get user by email
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=lower(email)).first()
 
         # If there is a user with the email
         if user != None:
