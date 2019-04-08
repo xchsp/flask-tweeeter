@@ -46,7 +46,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), default='default.jpg')
     password = db.Column(db.String(64), nullable=False)
-    verified = db.Column(db.Integer(), default=0, nullable=False)
+    verified = db.Column(db.Integer, default=0, nullable=True)
     posts = db.relationship('Post', backref='author', lazy=True)
     likes = db.relationship('Post', secondary=likes,
                             backref=db.backref('likes', lazy='dynamic'), lazy='dynamic')
@@ -67,6 +67,7 @@ class Post(db.Model):
                             default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    retweet = db.Column(db.Integer, default=None, nullable=True, unique=False)
 
     # Defines how a post object will be printed in the shell
     def __repr__(self):
@@ -131,7 +132,7 @@ def home_following():
         if current_user() in follow_suggestions:  # If the current user is in the user's follow suggestions
             follow_suggestions.remove(current_user())
 
-    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
+    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions, User=User)
 
 
 # Single post route
@@ -347,6 +348,7 @@ def search():
         return render_template('results.html', posts=posts)
 
 
+# Follow route
 @app.route('/follow/<id>')
 @is_logged_in
 def follow(id):
@@ -372,6 +374,7 @@ def follow(id):
         return redirect(url_for('home'))
 
 
+# Unfollow route
 @app.route('/unfollow/<id>')
 @is_logged_in
 def unfollow(id):
@@ -394,6 +397,33 @@ def unfollow(id):
 
         flash(f'Unfollowed {user_unfollowed.username}', 'warning')
         return redirect(url_for('home'))
+
+
+# Retweet route
+@app.route('/retweet/<id>')
+@is_logged_in
+def retweet(id):
+    re_post = Post.query.filter_by(id=id).first()
+
+    if re_post.retweet != None:
+        flash("You can't retweet a retweeted tweet :(", 'danger')
+        return redirect(url_for('home'))
+
+    if Post.query.filter_by(user_id=current_user().id).filter_by(retweet=id).all():
+        rm_post = Post.query.filter_by(
+            user_id=current_user().id).filter_by(retweet=id).first()
+        db.session.delete(rm_post)
+        db.session.commit()
+
+        flash('Unretweeted successfully', 'warning')
+        return redirect(url_for('home'))
+
+    post = Post(content='', user_id=current_user().id, retweet=id)
+    db.session.add(post)
+    db.session.commit()
+
+    flash('Retweeted successfully', 'success')
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

@@ -18,10 +18,36 @@
                             class="has-text-weight-semibold">&nbsp;&nbsp;{{post.date_posted.strftime('%B %d, %Y')}}</small>
                         <br>
                         <p style="margin-bottom: .8rem;">{{post.content}}</p>
+
+
+                        <!-- retweet logic -->
+                        {% if post.retweet != None  %}
+                        {% set retweet = Post_model.query.filter_by(id=post.retweet).first() %}
+                        <!-- retweet box -->
+                        <div class="box" style="padding: 0.75rem 1.5rem;">
+                            <div class="content is-small">
+                                <p>
+                                    <strong
+                                        class="has-text-info">@{{retweet.author.username}}{% if post.author.verified %}
+                                        &nbsp;<i class="fas fa-check-circle"></i>
+                                        {% endif %}</strong>
+                                    <small
+                                        class="has-text-weight-semibold">&nbsp;&nbsp;{{retweet.date_posted.strftime('%B %d, %Y')}}</small>
+                                    <br>
+                                    <p style="margin-bottom: .8rem;">{{retweet.content}}</p>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- retweet box end -->
+                        {% endif %}
+
+
                     </p>
                 </div>
+
                 <div class="level-left">
-                    <a class="level-item has-text-weight-semibold" href="/like/{{post.id}}">
+
+                    <a class="level-item has-text-weight-semibold" href="/like/{{post.id}}" style="margin-right: 2rem;">
                         <!--  if username found in session (user is logged in) -->
                         {% if user != None %}
                         <!-- if user has liked post make heart red and full -->
@@ -39,7 +65,28 @@
                                 class="far fa-heart"></i>&nbsp;&nbsp;</span>{{post.likes.all()|length}}
                         {% endif %}
                     </a>
+
+
+                    {% if post.retweet == None %}
+                    <a class="level-item has-text-weight-semibold" href="/retweet/{{post.id}}">
+                        <!--  if username found in session (user is logged in) -->
+                        {% if user != None %}
+                        <!-- if user has retweeted post make icon green -->
+                        {% if Post_model.query.filter_by(user_id=user.id).filter_by(retweet=post.id).first() %}
+                        <span class="icon is-small has-text-primary"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        <!-- if user hasnt retweeted post make icon grey -->
+                        {% else %}
+                        <span class="icon is-small has-text-grey"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        {% endif %}
+                        <!-- if user is not logged in make icon grey -->
+                        {% else %}
+                        <span class="icon is-small has-text-grey"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
+
                 </div>
+
             </div>
         </article>
     </a>
