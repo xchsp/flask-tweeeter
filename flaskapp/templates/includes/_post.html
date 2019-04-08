@@ -25,18 +25,20 @@
                         {% set retweet = Post_model.query.filter_by(id=post.retweet).first() %}
                         <!-- retweet box -->
                         <div class="box" style="padding: 0.75rem 1.5rem;">
-                            <div class="content is-small">
-                                <p>
-                                    <strong
-                                        class="has-text-info">@{{retweet.author.username}}{% if post.author.verified %}
-                                        &nbsp;<i class="fas fa-check-circle"></i>
-                                        {% endif %}</strong>
-                                    <small
-                                        class="has-text-weight-semibold">&nbsp;&nbsp;{{retweet.date_posted.strftime('%B %d, %Y')}}</small>
-                                    <br>
-                                    <p style="margin-bottom: .8rem;">{{retweet.content}}</p>
-                                </p>
-                            </div>
+                            <a href="/post/{{retweet.id}}" class="has-text-dark">
+                                <div class="content is-small">
+                                    <p>
+                                        <strong
+                                            class="has-text-info">@{{retweet.author.username}}{% if post.author.verified %}
+                                            &nbsp;<i class="fas fa-check-circle"></i>
+                                            {% endif %}</strong>
+                                        <small
+                                            class="has-text-weight-semibold">&nbsp;&nbsp;{{retweet.date_posted.strftime('%B %d, %Y')}}</small>
+                                        <br>
+                                        <p style="margin-bottom: .8rem;">{{retweet.content}}</p>
+                                    </p>
+                                </div>
+                            </a>
                         </div>
                         <!-- retweet box end -->
                         {% endif %}
