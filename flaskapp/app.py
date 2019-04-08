@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, flash, redirect, request, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators, FileField
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 import os
 from werkzeug.utils import secure_filename
@@ -108,7 +108,7 @@ def home():
         if current_user() in follow_suggestions:  # If the current user is in the user's follow suggestions
             follow_suggestions.remove(current_user())
 
-    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions)
+    return render_template('home.html', posts=posts, user=current_user(), Post_model=Post, likes=likes, follow_suggestions=follow_suggestions, User=User)
 
 
 # Home route (following)

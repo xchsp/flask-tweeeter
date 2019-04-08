@@ -40,9 +40,16 @@
                             </div>
                             <div class="level-item">
                                 <div class="content is-small">
-                                    <small>Has liked</small>
-                                    {% set user_likes = user.likes.all() %}
-                                    <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_likes|length }}</h4>
+                                    <small>Following</small>
+                                    {% set user_following = [] %}
+                                    {% for user_query in User.query.all() %}
+                                    {% for user_query_followers in user_query.followers.all() %}
+                                    {% if user_query_followers == user %}
+                                    {% set user_following = user_following.append(user) %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                    <h4 class="has-text-info" style="margin-bottom: 0;">{{ user_following|length }}</h4>
                                 </div>
                             </div>
                             <div class="level-item">
