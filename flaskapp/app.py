@@ -8,16 +8,20 @@ import os
 from werkzeug.utils import secure_filename
 from functools import wraps
 
+##########################  CONFIG  ####################################
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+app.secret_key = 'testing321'
 
 app.config['UPLOAD_FOLDER'] = 'N:\\Documents\\webdev\\python\\flask-tweeeter\\flaskapp\\static\\profile_pics'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'JPG', 'PNG'])
 
+
+############################    MODELS  ##################################
 
 # Likes association table (associates between users and likes with to columns)
 likes = db.Table('likes',
@@ -69,6 +73,8 @@ class Post(db.Model):
         return f"Post ('{self.id}', '{self.date_posted}')"
 
 
+##################################  UTILS #####################################
+
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -88,6 +94,8 @@ def current_user():
     else:
         return None
 
+
+############################    ROUTES  #####################################
 
 # Home route (default)
 @app.route('/')
@@ -389,5 +397,4 @@ def unfollow(id):
 
 
 if __name__ == '__main__':
-    app.secret_key = 'testing321'
     app.run(debug=True)
