@@ -345,7 +345,7 @@ def search():
         posts = Post.query.filter(
             Post.content.like('%' + query + '%'))
 
-        return render_template('results.html', posts=posts)
+        return render_template('results.html', posts=posts, Post_model=Post, user=current_user(), query=query)
 
 
 # Follow route
