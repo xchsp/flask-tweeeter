@@ -117,7 +117,7 @@ def home():
 @is_logged_in
 def home_following():
     posts = []
-    follow_suggestions = User.query.all()[0:5]
+    follow_suggestions = User.query.all()[0:6]
 
     follows = current_user().followed.all()
 
