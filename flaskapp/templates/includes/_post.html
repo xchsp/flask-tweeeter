@@ -85,7 +85,7 @@
                     {% if post.retweet == None %}
                     {% set post_retweets = Post_model.query.filter_by(retweet=post.id).all()|length %}
                     <a class="level-item has-text-weight-semibold" href="/retweet/{{post.id}}"
-                        style="margin-right: 2rem;">
+                        style="margin-right: 2.5rem;">
                         <!--  if username found in session (user is logged in) -->
                         {% if user != None %}
                         <!-- if user has retweeted post make icon green -->
