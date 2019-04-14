@@ -137,9 +137,10 @@ def home_following():
 
 
 # Single post route
-@app.route('/post/<string:id>')
+@app.route('/post/<int:id>')
 def post(id):
-    return render_template('post.html', id=id)
+    post = Post.query.filter_by(id=id).first()
+    return render_template('post.html', id=id, post=post, Post_model=Post, user=current_user())
 
 
 # Register form class
