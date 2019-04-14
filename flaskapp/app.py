@@ -460,5 +460,10 @@ def new_comment(post_id):
     return render_template('new_post.html', form=form, title=f"Comment to @{commented_post.author.username}'s tweeet:")
 
 
+@app.errorhandler(404)
+def error404(error):
+    return render_template('404.html'), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
