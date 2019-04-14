@@ -83,22 +83,52 @@
 
 
                     {% if post.retweet == None %}
-                    <a class="level-item has-text-weight-semibold" href="/retweet/{{post.id}}">
+                    {% set post_retweets = Post_model.query.filter_by(retweet=post.id).all()|length %}
+                    <a class="level-item has-text-weight-semibold" href="/retweet/{{post.id}}"
+                        style="margin-right: 2rem;">
                         <!--  if username found in session (user is logged in) -->
                         {% if user != None %}
                         <!-- if user has retweeted post make icon green -->
                         {% if Post_model.query.filter_by(user_id=user.id).filter_by(retweet=post.id).first() %}
-                        <span class="icon is-small has-text-primary"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        <span class="icon is-small has-text-primary"><i
+                                class="fas fa-retweet"></i>&nbsp;&nbsp;{{post_retweets}}</span>
                         <!-- if user hasnt retweeted post make icon grey -->
                         {% else %}
-                        <span class="icon is-small has-text-grey"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        <span class="icon is-small has-text-grey"><i
+                                class="fas fa-retweet"></i>&nbsp;&nbsp;{{post_retweets}}</span>
                         {% endif %}
                         <!-- if user is not logged in make icon grey -->
                         {% else %}
-                        <span class="icon is-small has-text-grey"><i class="fas fa-retweet"></i>&nbsp;&nbsp;</span>
+                        <span class="icon is-small has-text-grey"><i
+                                class="fas fa-retweet"></i>&nbsp;&nbsp;{{post_retweets}}</span>
                         {% endif %}
                     </a>
                     {% endif %}
+
+
+                    {% if post.comment == None %}
+                    {% set post_comments = Post_model.query.filter_by(comment=post.id).all()|length %}
+                    <a class="level-item has-text-weight-semibold" href="/new_comment/{{post.id}}"
+                        style="margin-right: 2rem;">
+                        <!--  if username found in session (user is logged in) -->
+                        {% if user != None %}
+                        <!-- if user has retweeted post make icon green -->
+                        {% if Post_model.query.filter_by(user_id=user.id).filter_by(comment=post.id).first() %}
+                        <span class="icon is-small has-text-primary"><i
+                                class="fas fa-comment"></i>&nbsp;&nbsp;{{post_comments}}</span>
+                        <!-- if user hasnt retweeted post make icon grey -->
+                        {% else %}
+                        <span class="icon is-small has-text-grey"><i
+                                class="far fa-comment"></i>&nbsp;&nbsp;{{post_comments}}</span>
+                        {% endif %}
+                        <!-- if user is not logged in make icon grey -->
+                        {% else %}
+                        <span class="icon is-small has-text-grey"><i
+                                class="far fa-comment"></i>&nbsp;&nbsp;{{post_comments}}</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
+
 
                 </div>
 

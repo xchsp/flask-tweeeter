@@ -68,6 +68,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     retweet = db.Column(db.Integer, default=None, nullable=True, unique=False)
+    comment = db.Column(db.Integer, default=None, nullable=True, unique=False)
 
     # Defines how a post object will be printed in the shell
     def __repr__(self):
@@ -101,7 +102,7 @@ def current_user():
 # Home route (default)
 @app.route('/')
 def home():
-    posts = Post.query.all()
+    posts = Post.query.filter_by(comment=None).all()
     follow_suggestions = User.query.all()[0:6]
 
     # Remove current user from follow suggestions
@@ -243,11 +244,13 @@ class PostForm(Form):
     content = TextAreaField('Content', [validators.Length(min=1, max=280)])
 
 # New Post
-@app.route('/new_post', methods=['GET', 'POST'])
+@app.route('/new_post/', methods=['GET', 'POST'])
 @is_logged_in
 def new_post():
+
     form = PostForm(request.form)
     if request.method == 'POST' and form.validate():
+
         # Get form content
         content = form.content.data
 
@@ -263,7 +266,7 @@ def new_post():
         flash('Your new post has been created!  😊', 'success')
         return redirect(url_for('home'))
 
-    return render_template('new_post.html', form=form)
+    return render_template('new_post.html', form=form, title='New post')
 
 
 # Like post
@@ -424,6 +427,36 @@ def retweet(id):
 
     flash('Retweeted successfully', 'success')
     return redirect(url_for('home'))
+
+
+# New Comment
+@app.route('/new_comment/<post_id>', methods=['GET', 'POST'])
+@is_logged_in
+def new_comment(post_id):
+
+    # Commented post
+    commented_post = Post.query.filter_by(id=post_id).first()
+
+    form = PostForm(request.form)
+    if request.method == 'POST' and form.validate():
+
+        # Get form content
+        content = f'@{commented_post.author.username}  ' + form.content.data
+
+        # Make comment object
+        comment = Post(content=content, author=current_user(), comment=post_id)
+
+        # Add comment to db session
+        db.session.add(comment)
+
+        # Commit session to db
+        db.session.commit()
+
+        flash(
+            f"You have replied to {commented_post.author.username}'s tweeet", 'success')
+        return redirect(url_for('home'))
+
+    return render_template('new_post.html', form=form, title=f"Comment to @{commented_post.author.username}'s tweeet:")
 
 
 if __name__ == '__main__':
